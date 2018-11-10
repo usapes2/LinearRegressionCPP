@@ -20,6 +20,10 @@ public:
 	KMeans(){};
         ~KMeans(){};
 
+	KMeans(int k_, vector<pair<double,double>> & data_): m_k(k_), m_means(k_), m_data(k_) {
+		m_data[0] = data_;
+	};
+
 	void clusterData(valarray<pair<double,double>>& init_means_, int num_iters_){
 		m_means = init_means_;
 		this->assignLabels();
@@ -63,10 +67,34 @@ private:
 		cout <<"\r\n";
 		return res;
 	}
+	void assignLabels() {
+		valarray<vector<pair<double,double>>> new_data(m_k);
+		for( auto const & clust : m_data) {
+			for(auto const & feature : clust) {
+				int closest_mean = this->computeClosestCentroid(feature);
+				new_data[closest_mean].push_back(feature);
+			}
+		}
+		m_data = new_data;
+	}
+
+	int computeClosestCentroid( const pair<double,double> & point_){
+		valarray<double> distances(m_k);
+		for(int k = 0; k < m_k; k++ ) {
+			double del_x = get<0>(point_) - get<0>(m_means[k]);
+			double del_y = get<1>(point_) - get<1>(m_means[k]);
+			double dist = sqrt((del_x * del_x) + (del_y * del_y));
+			distances[k] = dist;
+		}
+		auto closest_mean = distance(begin(distances),min_element(begin(distances),end(distances)));
+		return closest_mean;
+		
+	}
+
 
 	// Private data members
 	int m_k;
-	itn m_features;
+	int m_features;
 	valarray<pair<double,double>> m_means;
 	valarray<vector<pair<double,double>>> m_data;
 	
@@ -74,6 +102,18 @@ private:
 };
 int main(int argc, const char *argv[])
 {
+	vector<pair<double,double>> data = {
+		{1.1,1}, {1.4,2}, {3.8,7}, {5.0,8}, {4.3,6},
+		{8,5.0},{6,8.5},{3,2.0},{9,6},{9.1,4}
+	};
+	KMeans km(3,data);
+	valarray<pair<double,double>> init_means_ = {
+		{1,1},{3,4},{8,8}
+	};
+
+	km.clusterData(init_means_,20);
+	km.printClusters();
+
 	
 	return 0;
 }
