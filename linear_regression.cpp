@@ -30,7 +30,7 @@ Linear_Regression(vector<double>& m_x_vals_, vector<double>& m_y_vals_):
 		m_b = b_init_;
 
 		while (!isConverged() && iter < num_iters_) {
-			double step = 0.02;
+			double step = 2 / double (iter + 2) ;
 			double a_grad = 0;
 			double b_grad = 0;
 
