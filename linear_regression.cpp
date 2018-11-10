@@ -23,7 +23,37 @@ Linear_Regression(vector<double>& m_x_vals_, vector<double>& m_y_vals_):
        m_x_vals(m_x_vals_), m_y_vals(m_y_vals_),m_num_elems(m_y_vals_.size()) {};
 
 
-	void trainAlgorithm() {
+	void trainAlgorithm(int num_iters_,double a_init_, double b_init_) {
+		int iter = 0;
+		m_a = a_init_;
+		m_b = b_init_;
+
+		while (iter < num_iters_) {
+			double step = 0.02;
+			double a_grad = 0;
+			double b_grad = 0;
+
+			for (int i = 0; i < m_num_elems; i++) {
+				a_grad += m_x_vals[i] * ((m_a * m_x_vals[i] + m_b) -
+						m_y_vals[i]);
+			}
+			a_grad = (2 * a_grad) / m_num_elems;
+
+			for (int i = 0; i < m_num_elems; i++) {
+				b_grad += ((m_a * m_x_vals[i] + m_b) 
+						- m_y_vals[i]);
+			}
+			b_grad = (2 * b_grad) / m_num_elems;
+
+			// step
+			m_a = m_a - (step * a_grad);
+			m_b = m_b - (step * b_grad);
+
+			cout << "a:\t" << m_a << ", b:\t" << m_b << "\r\n";
+			cout << "grad_a:\t" <<a_grad <<", b_grad:\t"<<b_grad<<"\r\n";
+			iter++;
+		}
+
 	}
 
 	double regress(double x_){
@@ -37,8 +67,7 @@ private:
 	double m_b;
 
 
-protected:
-
+protected: 
 };
 
 int main(int argc, const char *argv[])
